@@ -15,7 +15,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "update:abi": "cp ../my-wave-portal/artifacts/contracts/WavePortal.sol/WavePortal.json src/utils/"
   },
   "eslintConfig": {
     "extends": "react-app"
