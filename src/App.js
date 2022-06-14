@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ethers } from "ethers";
 import "./App.css";
 import abi from "./utils/WavePortal.json";
 import ReactLoading from "react-loading";
+import party from "party-js";
 
 const App = () => {
   // ユーザのパブリックウォレット
@@ -15,6 +16,7 @@ const App = () => {
   const [balance, setBalance] = useState(null);
   // ロード中を表示するか
   const [isLoading, setIsLoading] = useState(false);
+  const inputEl = useRef(null);
 
   // デプロイ済みのコントラクトのアドレス
   const contractAddress = "0x840763d1468c7bF798f9dC94e2A34a1DeD955693";
@@ -138,7 +140,7 @@ const App = () => {
     };
   }, [contractABI]);
 
-  const wave = async () => {
+  const wave = async (e) => {
     if (!messageValue) {
       return;
     }
@@ -188,10 +190,12 @@ const App = () => {
       } else {
         console.error("Ethereum object doesn't exist!");
       }
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
+      setIsLoading(false);
+      return;
     }
-    setIsLoading(false);
   };
 
   const connectWallet = async () => {
@@ -214,6 +218,17 @@ const App = () => {
   const handleClick = () => {
     // 新規タブを開いて遷移
     window.open(`https://rinkeby.etherscan.io/address/${contractAddress}`);
+  };
+
+  const loadingClick = (e) => {
+    party.confetti(e.target, {
+      speed: party.variation.range(100, 600),
+      count: party.variation.range(20, 60),
+    });
+    party.sparkles(e.target, {
+      speed: party.variation.range(100, 400),
+      count: party.variation.range(20, 60),
+    });
   };
 
   return (
@@ -254,17 +269,19 @@ const App = () => {
           )}
 
           {isLoading ? (
-            <div className="loading">
+            <div className="loading" onClick={(e) => loadingClick(e)}>
               <ReactLoading
                 type="spin"
                 color="#ebc634"
                 height="100px"
                 width="100px"
               />
-              <p>Loading...</p>
+              <button className="clickme" onClick={(e) => loadingClick(e)}>
+                Click Me
+              </button>
             </div>
           ) : (
-            <button className="waveButton" onClick={wave}>
+            <button className="waveButton" onClick={(e) => wave(e)}>
               Wave at Me
             </button>
           )}
