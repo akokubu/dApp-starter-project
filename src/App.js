@@ -210,9 +210,9 @@ const App = () => {
       });
       console.log("Connected: ", accounts[0]);
       setCurrentAccount(accounts[0]);
+      getAllWaves();
     } catch (error) {
       console.error(error);
-      setIsLoading();
     }
   };
   const handleClick = () => {
@@ -229,6 +229,26 @@ const App = () => {
       speed: party.variation.range(100, 400),
       count: party.variation.range(20, 60),
     });
+  };
+
+  const Loading = ({ children }) => {
+    if (isLoading) {
+      return (
+        <div className="loading" onClick={(e) => loadingClick(e)}>
+          <ReactLoading
+            type="spin"
+            color="#ebc634"
+            height="100px"
+            width="100px"
+          />
+          <button className="clickme" onClick={(e) => loadingClick(e)}>
+            Click Me
+          </button>
+        </div>
+      );
+    } else {
+      return <>{children}</>;
+    }
   };
 
   return (
@@ -268,23 +288,13 @@ const App = () => {
             />
           )}
 
-          {isLoading ? (
-            <div className="loading" onClick={(e) => loadingClick(e)}>
-              <ReactLoading
-                type="spin"
-                color="#ebc634"
-                height="100px"
-                width="100px"
-              />
-              <button className="clickme" onClick={(e) => loadingClick(e)}>
-                Click Me
+          <Loading>
+            {currentAccount && (
+              <button className="waveButton" onClick={(e) => wave(e)}>
+                Wave at Me
               </button>
-            </div>
-          ) : (
-            <button className="waveButton" onClick={(e) => wave(e)}>
-              Wave at Me
-            </button>
-          )}
+            )}
+          </Loading>
 
           {/* ウォレットコネクトのボタン */}
           {!currentAccount && (
