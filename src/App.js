@@ -186,76 +186,89 @@ const App = () => {
       console.error(error);
     }
   };
+  const handleClick = () => {
+    // 新規タブを開いて遷移
+    window.open(`https://rinkeby.etherscan.io/address/${contractAddress}`);
+  };
 
   return (
-    <div className="mainContainer">
-      <div className="dataContainer">
-        <div className="header">
-          <span role="img" aria-label="hand-wave">
-            👋
-          </span>{" "}
-          WELCOME!
-        </div>
+    <>
+      <div className="mainContainer">
+        <div className="dataContainer">
+          <div className="header">
+            <span role="img" aria-label="hand-wave">
+              👋
+            </span>{" "}
+            WELCOME!
+          </div>
 
-        <div className="bio">
-          イーサリアムウォレットを接続して、メッセージを作成したら、
-          <span role="img" aria-label="hand-wave">
-            👋
-          </span>
-          を送ってください
-          <span role="img" aria-label="shine">
-            ✨
-          </span>
-        </div>
+          <div className="bio">
+            イーサリアムウォレットを接続して、メッセージを作成したら、
+            <span role="img" aria-label="hand-wave">
+              👋
+            </span>
+            を送ってください
+            <span role="img" aria-label="shine">
+              ✨
+            </span>
+          </div>
 
-        {currentAccount && (
-          <textarea
-            name="messageArea"
-            placeholder="メッセージはこちら"
-            type="text"
-            id="message"
-            value={messageValue}
-            onChange={(e) => setMessageValue(e.target.value)}
-          />
-        )}
+          {currentAccount && (
+            <textarea
+              name="messageArea"
+              placeholder="メッセージはこちら"
+              type="text"
+              id="message"
+              value={messageValue}
+              onChange={(e) => setMessageValue(e.target.value)}
+            />
+          )}
 
-        <button className="waveButton" onClick={wave}>
-          Wave at Me
-        </button>
-        {/* ウォレットコネクトのボタン */}
-        {!currentAccount && (
-          <button className="waveButton" onClick={connectWallet}>
-            Connect Wallet
+          <button className="waveButton" onClick={wave}>
+            Wave at Me
           </button>
-        )}
-        {currentAccount && (
-          <button className="waveButton" onClick={connectWallet}>
-            Wallet Connected
+          {/* ウォレットコネクトのボタン */}
+          {!currentAccount && (
+            <button className="waveButton" onClick={connectWallet}>
+              Connect Wallet
+            </button>
+          )}
+          {currentAccount && (
+            <button className="waveButton" onClick={connectWallet}>
+              Wallet Connected
+            </button>
+          )}
+          <button className="waveButton" onClick={handleClick}>
+            <img
+              src="https://rinkeby.etherscan.io/assets/svg/logos/logo-etherscan.svg?v=0.0.2"
+              alt="Rinkeby Etherscan"
+              width="100"
+            />
           </button>
-        )}
 
-        {currentAccount &&
-          allWaves
-            .slice(0)
-            .reverse()
-            .map((wave, index) => {
-              return (
-                <div
-                  key={index}
-                  style={{
-                    backgroundColor: "F8F8FF",
-                    marginTop: "16px",
-                    padding: "8px",
-                  }}
-                >
-                  <div>Address: {wave.address}</div>
-                  <div>Time: {wave.timestamp.toString()}</div>
-                  <div>Message: {wave.message}</div>
-                </div>
-              );
-            })}
+          {currentAccount &&
+            allWaves
+              .slice(0)
+              .reverse()
+              .map((wave, index) => {
+                return (
+                  <div
+                    key={index}
+                    style={{
+                      backgroundColor: "F8F8FF",
+                      marginTop: "16px",
+                      padding: "8px",
+                    }}
+                  >
+                    <div>Address: {wave.address}</div>
+                    <div>Time: {wave.timestamp.toString()}</div>
+                    <div>Message: {wave.message}</div>
+                  </div>
+                );
+              })}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
