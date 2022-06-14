@@ -10,9 +10,11 @@ const App = () => {
   const [messageValue, setMessageValue] = useState("");
   // すべてのwaves
   const [allWaves, setAllWaves] = useState([]);
+  // コントラクト残高
+  const [balance, setBalance] = useState(null);
 
   // デプロイ済みのコントラクトのアドレス
-  const contractAddress = "0xFDa0fD12CE7db5A25bf27Cb2333035c799765A41";
+  const contractAddress = "0x840763d1468c7bF798f9dC94e2A34a1DeD955693";
   // ABIファイル
   const contractABI = abi.abi;
 
@@ -35,6 +37,7 @@ const App = () => {
           return {
             address: wave.waver,
             timestamp: new Date(wave.timestamp * 1000),
+            isWin: wave.isWin,
             message: wave.message,
           };
         });
@@ -72,20 +75,41 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
+  const getBalance = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const wavePortalContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      signer
+    );
+    const contractBalance = await provider.getBalance(
+      wavePortalContract.address
+    );
+    setBalance(ethers.utils.formatEther(contractBalance));
+    console.log(
+      "Contract balance: ",
+      ethers.utils.formatEther(contractBalance)
+    );
+    return contractBalance;
+  };
+
+  useEffect(async () => {
     checkIfWalletIsConnected();
+    await getBalance();
   }, []);
 
   useEffect(() => {
     let wavePortalContract;
 
-    const onNewWave = (from, timestamp, message) => {
-      console.log("NweWave", from, timestamp, message);
+    const onNewWave = (from, timestamp, isWin, message) => {
+      console.log("NweWave", from, timestamp, isWin, message);
       setAllWaves((prevState) => [
         ...prevState,
         {
           address: from,
           timestamp: new Date(timestamp * 1000),
+          isWin,
           message,
         },
       ]);
@@ -131,13 +155,8 @@ const App = () => {
         console.log("Retrieve total wave count...", count.toNumber());
         console.log("Signer: ", signer);
 
-        const contractBalance = await provider.getBalance(
-          wavePortalContract.address
-        );
-        console.log(
-          "Contract balance: ",
-          ethers.utils.formatEther(contractBalance)
-        );
+        // wave前の残高
+        const contractBalance = await getBalance();
 
         // コントラクトに👋（wave）を書き込む
         const waveTxn = await wavePortalContract.wave(messageValue, {
@@ -149,19 +168,16 @@ const App = () => {
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieve total wave count...", count.toNumber());
 
-        const contractBalancePost = await provider.getBalance(
-          wavePortalContract.address
-        );
-        console.log(
-          "Contract balance after: ",
-          ethers.utils.formatEther(contractBalancePost)
-        );
+        // wave後の残高
+        const contractBalancePost = await getBalance();
+
         // 残高が減っていたら当たったと判断する
         if (contractBalancePost < contractBalance) {
           console.log("User won ETH!");
         } else {
           console.log("User didn't win ETH.");
         }
+        setMessageValue("");
       } else {
         console.error("Ethereum object doesn't exist!");
       }
@@ -213,6 +229,10 @@ const App = () => {
             </span>
           </div>
 
+          <div className="header">
+            残高: {balance ? `${balance} ETH` : "-"} 当たり残数:{" "}
+            {Math.ceil(balance / 0.00005)}回
+          </div>
           {currentAccount && (
             <textarea
               name="messageArea"
@@ -262,6 +282,7 @@ const App = () => {
                   >
                     <div>Address: {wave.address}</div>
                     <div>Time: {wave.timestamp.toString()}</div>
+                    <div>isWin: {wave.isWin ? "🎉" : ""}</div>
                     <div>Message: {wave.message}</div>
                   </div>
                 );
