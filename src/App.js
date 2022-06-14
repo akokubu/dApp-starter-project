@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import "./App.css";
 import abi from "./utils/WavePortal.json";
@@ -16,7 +16,6 @@ const App = () => {
   const [balance, setBalance] = useState(null);
   // ロード中を表示するか
   const [isLoading, setIsLoading] = useState(false);
-  const inputEl = useRef(null);
 
   // デプロイ済みのコントラクトのアドレス
   const contractAddress = "0x840763d1468c7bF798f9dC94e2A34a1DeD955693";
@@ -142,6 +141,7 @@ const App = () => {
 
   const wave = async (e) => {
     if (!messageValue) {
+      alert("メッセージを入力してください");
       return;
     }
     setIsLoading(true);
