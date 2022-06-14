@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import "./App.css";
 import abi from "./utils/WavePortal.json";
+import ReactLoading from "react-loading";
 
 const App = () => {
   // ユーザのパブリックウォレット
@@ -12,6 +13,8 @@ const App = () => {
   const [allWaves, setAllWaves] = useState([]);
   // コントラクト残高
   const [balance, setBalance] = useState(null);
+  // ロード中を表示するか
+  const [isLoading, setIsLoading] = useState(false);
 
   // デプロイ済みのコントラクトのアドレス
   const contractAddress = "0x840763d1468c7bF798f9dC94e2A34a1DeD955693";
@@ -136,6 +139,10 @@ const App = () => {
   }, [contractABI]);
 
   const wave = async () => {
+    if (!messageValue) {
+      return;
+    }
+    setIsLoading(true);
     try {
       const { ethereum } = window;
       if (ethereum) {
@@ -184,6 +191,7 @@ const App = () => {
     } catch (error) {
       console.error(error);
     }
+    setIsLoading(false);
   };
 
   const connectWallet = async () => {
@@ -200,6 +208,7 @@ const App = () => {
       setCurrentAccount(accounts[0]);
     } catch (error) {
       console.error(error);
+      setIsLoading();
     }
   };
   const handleClick = () => {
@@ -244,9 +253,22 @@ const App = () => {
             />
           )}
 
-          <button className="waveButton" onClick={wave}>
-            Wave at Me
-          </button>
+          {isLoading ? (
+            <div className="loading">
+              <ReactLoading
+                type="spin"
+                color="#ebc634"
+                height="100px"
+                width="100px"
+              />
+              <p>Loading...</p>
+            </div>
+          ) : (
+            <button className="waveButton" onClick={wave}>
+              Wave at Me
+            </button>
+          )}
+
           {/* ウォレットコネクトのボタン */}
           {!currentAccount && (
             <button className="waveButton" onClick={connectWallet}>
